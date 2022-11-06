@@ -1,7 +1,8 @@
 #include <ESP32Servo.h>
 
 const int lowerPin = 26, upperPin = 27;
-const int darkBound = 2400, lightBound = 3000;
+const int lowerDarkBound = 3500, lowerLightBound = 4000, 
+          upperDarkBound = 2800, upperLightBound = 3100;
 // variable for storing the potentiometer value
 int lowerResValue, upperResValue;
 
@@ -27,10 +28,12 @@ void loop() {
   Serial.print("Upper Val: ");
   Serial.println(upperResValue);
 
-  servo.write(90);
-  delay(1000);
-  servo.write(0);
-  
-  
-  delay(1000);
+  if(lowerResValue < 3900){
+    Serial.println("HERE HERE HERE HERE ");
+   }
+  if(lowerResValue < lowerDarkBound || upperResValue < upperDarkBound){
+    servo.write(15);
+    delay(150);
+    servo.write(0); 
+  }
 }
