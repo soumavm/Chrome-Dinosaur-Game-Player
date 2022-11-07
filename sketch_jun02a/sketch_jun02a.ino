@@ -1,11 +1,12 @@
 #include <ESP32Servo.h>
 
 const int lowerPin = 26, upperPin = 27;
-const int lowerDarkBound = 3000, lowerLightBound = 3400, 
-          upperDarkBound = 2800, upperLightBound = 3100;
+const int lowerBound = 3100, lowerInvertBound = 1700, 
+          upperBound = 2900, upperInvertBound = 1780;
 // variable for storing the potentiometer value
 int lowerResValue, upperResValue;
 bool bgWhite = true;
+int delayCount=0;
 
 Servo servo;
 const byte servoGPIO = 25;
@@ -23,35 +24,43 @@ void loop() {
   lowerResValue = analogRead(lowerPin);
   upperResValue = analogRead(upperPin);
 
-  Serial.print("lower Val: ");
-  Serial.println(lowerResValue);
+//  Serial.print("lower Val: ");
+//  Serial.println(lowerResValue);
+//
+//  Serial.print("Upper Val: ");
+//  Serial.println(upperResValue);
 
-  Serial.print("Upper Val: ");
-  Serial.println(upperResValue);
+  if(delayCount){
+    delayCount--;  
+  }
+  
   if(bgWhite){
-    if(lowerResValue < lowerDarkBound || upperResValue < upperDarkBound){
-      servo.write(15);
+    if(lowerResValue < lowerBound || upperResValue < upperBound){
+      servo.write(7);
       delay(150);
-      servo.write(0); 
+      servo.write(0);
+
     }
-    if(upperResValue < upperDarkBound){
-      delay(500);
-      if(upperResValue < upperDarkBound){
-        bgWhite = false;
-      }
+    if((lowerResValue < lowerBound) && (upperResValue < upperBound)){
+      delayCount+=2;
+    }
+    if(delayCount>=4){
+      bgWhite=false;
+      delayCount=0;
     }
   }
   else{
-    if(lowerResValue < lowerLightBound || upperResValue < upperLightBound){
-      servo.write(15);
-      delay(200);
-      servo.write(0); 
+    if(lowerResValue > lowerInvertBound || upperResValue > upperInvertBound){
+      servo.write(7);
+      delay(150);
+      servo.write(0);
     }
-    if(upperResValue < upperLightBound){
-      delay(500);
-      if(upperResValue < upperLightBound){
-        bgWhite = true;
-      }
+    if((lowerResValue > lowerInvertBound) && (upperResValue > upperInvertBound)){
+      delayCount+=2;
+    }
+    if(delayCount>=7){
+      bgWhite=true;
+      delayCount=0;
     }
   }
 }
